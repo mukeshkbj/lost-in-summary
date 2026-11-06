@@ -20,6 +20,15 @@ from .analyst import call
 
 ROOT = Path(__file__).resolve().parent.parent
 
+# Load API keys from .env (gitignored) if present.
+_env = ROOT / ".env"
+if _env.exists():
+    import os
+    for _line in _env.read_text().splitlines():
+        if "=" in _line and not _line.strip().startswith("#"):
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip().strip('"'))
+
 
 def main() -> None:
     ap = argparse.ArgumentParser()
@@ -44,7 +53,8 @@ def main() -> None:
     (out_dir / "scenarios.json").write_text(json.dumps([s.to_dict() for s in scenarios], indent=1))
 
     # Chatter is generated once per scenario and cached, so every condition shares it.
-    chat_path = ROOT / "logs" / f"chatter_{a.chatter}_{a.scenario_seed}.json"
+    tag = a.chatter if a.chatter == "template" else (a.chatter_model or "").replace("/", "_")
+    chat_path = ROOT / "logs" / f"chatter_{tag}_{a.scenario_seed}.json"
     chat = json.loads(chat_path.read_text()) if chat_path.exists() else {}
     for sc in scenarios:
         if sc.id not in chat:

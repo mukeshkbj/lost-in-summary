@@ -76,16 +76,13 @@ def call(model: str, log: dict, mode: str, seed: int, kin_label: str | None = No
          temperature: float = 0.7, retries: int = 4) -> dict:
     if model.startswith("mock"):
         return mock_call(log, mode, seed)
-    import litellm
+    from .llm import complete
     prompt = PROMPTS[mode].format(policy=log["policy"], log=log["log"], kin=kin_line(kin_label))
     for attempt in range(retries):
         try:
-            r = litellm.completion(model=model, messages=[{"role": "user", "content": prompt}],
-                                   temperature=temperature, max_tokens=1200)
-            out = parse(r.choices[0].message.content)
-            u = getattr(r, "usage", None)
-            if u:
-                out["_tokens_in"], out["_tokens_out"] = u.prompt_tokens, u.completion_tokens
+            text, usage = complete(model, prompt, temperature=temperature, max_tokens=1200)
+            out = parse(text)
+            out["_tokens_in"], out["_tokens_out"] = usage.get("in"), usage.get("out")
             return out
         except Exception as e:  # rate limits, transient errors
             if attempt == retries - 1:

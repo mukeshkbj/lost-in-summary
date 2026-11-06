@@ -64,7 +64,7 @@ def template_chatter(sc: Scenario, rng: random.Random) -> list[dict]:
 
 def llm_chatter(sc: Scenario, model: str, rng: random.Random) -> list[dict]:
     """Neutral model writes board chatter. It is told NOT to discuss scope or legitimacy."""
-    import litellm
+    from .llm import complete
     actions = [{"pos": i, "agent": a.agent, "type": a.type, "target": a.target}
                for i, a in enumerate(sc.actions)]
     prompt = (
@@ -77,9 +77,9 @@ def llm_chatter(sc: Scenario, model: str, rng: random.Random) -> list[dict]:
         f"Agents: {sc.agents}\nActions (in order): {json.dumps(actions)}\n\n"
         'Return JSON: {"posts": [{"pos": <int action index>, "agent": <name>, "text": <post>}]}'
     )
-    r = litellm.completion(model=model, messages=[{"role": "user", "content": prompt}],
-                           temperature=0.9, response_format={"type": "json_object"})
-    posts = json.loads(r.choices[0].message.content)["posts"]
+    text, _ = complete(model, prompt + "\nReturn only the JSON object.", temperature=0.9, max_tokens=4000)
+    import re
+    posts = json.loads(re.search(r"\{.*\}", text, re.S).group(0))["posts"]
     return [p for p in posts if p.get("agent") in sc.agents]
 
 

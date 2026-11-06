@@ -22,7 +22,7 @@ The same consensus claims are injected into clean episodes. This is the control 
 ## Setup
 
 ```bash
-pip install litellm pyyaml pandas matplotlib
+pip install litellm adaption pyyaml pandas matplotlib
 export ANTHROPIC_API_KEY=...   # and/or OPENAI_API_KEY, GEMINI_API_KEY (any provider litellm supports)
 ```
 
