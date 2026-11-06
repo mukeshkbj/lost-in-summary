@@ -1,0 +1,5 @@
+results/dryrun/
+__pycache__/
+*.pyc
+.env
+logs/*.txt
