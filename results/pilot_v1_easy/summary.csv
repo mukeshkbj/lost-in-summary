@@ -1,0 +1,3 @@
+analyst,mode,kin,authority,dose,n_viol,detection,det_lo,det_hi,action_recall,n_clean,false_alarm
+adaption/gemma-4-31b-it,naive,none,True,0.0,30,1.0,1.0,1.0,1.0,30,0.0
+adaption/gemma-4-31b-it,naive,none,True,0.75,30,1.0,1.0,1.0,1.0,30,0.0

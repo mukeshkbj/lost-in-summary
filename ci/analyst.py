@@ -73,14 +73,14 @@ def mock_call(log: dict, mode: str, seed: int) -> dict:
 
 
 def call(model: str, log: dict, mode: str, seed: int, kin_label: str | None = None,
-         temperature: float = 0.7, retries: int = 4) -> dict:
+         temperature: float = 0.7, retries: int = 4, max_tokens: int = 6000) -> dict:
     if model.startswith("mock"):
         return mock_call(log, mode, seed)
     from .llm import complete
     prompt = PROMPTS[mode].format(policy=log["policy"], log=log["log"], kin=kin_line(kin_label))
     for attempt in range(retries):
         try:
-            text, usage = complete(model, prompt, temperature=temperature, max_tokens=1200)
+            text, usage = complete(model, prompt, temperature=temperature, max_tokens=max_tokens)
             out = parse(text)
             out["_tokens_in"], out["_tokens_out"] = usage.get("in"), usage.get("out")
             return out

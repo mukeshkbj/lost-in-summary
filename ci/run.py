@@ -44,17 +44,21 @@ def main() -> None:
     ap.add_argument("--chatter", choices=["template", "llm"], default="template")
     ap.add_argument("--chatter-model", default=None, help="neutral third-family model for llm chatter")
     ap.add_argument("--workers", type=int, default=8)
+    ap.add_argument("--max-tokens", type=int, default=6000, help="analyst output budget; reasoning models need room to think")
     ap.add_argument("--scenario-seed", type=int, default=0)
+    ap.add_argument("--size", type=int, nargs=2, default=[40, 60], help="actions per episode (min max)")
+    ap.add_argument("--hint", type=int, nargs="+", default=[0], help="policy hint sentence off/on (ablation)")
+    ap.add_argument("--easy", action="store_true", help="obvious violations (pilot v1 setting)")
     a = ap.parse_args()
 
     out_dir = ROOT / "results" / a.name
     out_dir.mkdir(parents=True, exist_ok=True)
-    scenarios = make_scenarios(a.n_violating, a.n_clean, a.scenario_seed)
+    scenarios = make_scenarios(a.n_violating, a.n_clean, a.scenario_seed, subtle=not a.easy, size=tuple(a.size))
     (out_dir / "scenarios.json").write_text(json.dumps([s.to_dict() for s in scenarios], indent=1))
 
     # Chatter is generated once per scenario and cached, so every condition shares it.
     tag = a.chatter if a.chatter == "template" else (a.chatter_model or "").replace("/", "_")
-    chat_path = ROOT / "logs" / f"chatter_{tag}_{a.scenario_seed}.json"
+    chat_path = ROOT / "logs" / f"chatter_{tag}_{a.scenario_seed}_{'easy' if a.easy else 'subtle'}{'' if a.size == [40, 60] else f'_n{a.size[0]}-{a.size[1]}'}.json"
     chat = json.loads(chat_path.read_text()) if chat_path.exists() else {}
     for sc in scenarios:
         if sc.id not in chat:
@@ -67,9 +71,10 @@ def main() -> None:
     for sc in scenarios:
         for d in a.doses:
             for au in a.authority:
-                lg = build_log(sc, d, bool(au), chat[sc.id])
-                logs[(sc.id, d, au)] = lg
-                (ROOT / "logs" / f"{sc.id}_d{d}_a{au}.txt").write_text(lg["log"])
+                for h in a.hint:
+                    lg = build_log(sc, d, bool(au), chat[sc.id], hint=bool(h))
+                    logs[(sc.id, d, au, h)] = lg
+                    (ROOT / "logs" / f"{sc.id}_d{d}_a{au}.txt").write_text(lg["log"])
 
     res_path = out_dir / "results.jsonl"
     done = set()
@@ -81,24 +86,24 @@ def main() -> None:
 
     kins = a.kin or [None]
     jobs = []
-    for (sid, d, au), lg in logs.items():
+    for (sid, d, au, h), lg in logs.items():
         for m in a.analysts:
             for mode in a.modes:
                 for kin in kins:
                     for s in range(a.seeds):
-                        key = f"{sid}|{d}|{au}|{m}|{mode}|{kin}|{s}"
+                        key = f"{sid}|{d}|{au}|{h}|{m}|{mode}|{kin}|{s}"
                         if key not in done:
                             jobs.append((key, lg, m, mode, kin, s))
     print(f"{len(logs)} logs, {len(jobs)} analyst calls to run ({len(done)} already done)")
 
     with ThreadPoolExecutor(a.workers) as ex, res_path.open("a") as f:
-        futs = {ex.submit(call, m, lg, mode, s, kin): (key, lg, m, mode, kin, s)
+        futs = {ex.submit(call, m, lg, mode, s, kin, max_tokens=a.max_tokens): (key, lg, m, mode, kin, s)
                 for key, lg, m, mode, kin, s in jobs}
         for i, fut in enumerate(as_completed(futs), 1):
             key, lg, m, mode, kin, s = futs[fut]
             out = fut.result()
             rec = {"key": key, "scenario": lg["scenario"], "violating": lg["violating"],
-                   "dose": lg["dose"], "authority": lg["authority"], "analyst": m, "mode": mode,
+                   "dose": lg["dose"], "authority": lg["authority"], "hint": lg["hint"], "analyst": m, "mode": mode,
                    "kin": kin, "seed": s, "truth_actions": lg["truth_actions"], **out}
             f.write(json.dumps(rec) + "\n")
             f.flush()

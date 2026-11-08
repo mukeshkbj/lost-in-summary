@@ -1,0 +1,24 @@
+experiment,setup,detection,lo,hi,n,false_alarm,n_clean
+"Main (DeepSeek logs, 40-60 actions)","Single analyst, raw log",1.0,1.0,1.0,120,0.0,112
+"Main (DeepSeek logs, 40-60 actions)",Plain summaries,0.6324786324786325,0.4260280029476787,0.8017241379310345,117,0.025,120
+"Main (DeepSeek logs, 40-60 actions)",Provenance summaries,0.7358490566037735,0.5713951935914553,0.8857142857142857,106,0.021052631578947368,95
+"Main (DeepSeek logs, 40-60 actions)",Plain + policy-aware,0.8666666666666667,0.6333333333333333,1.0,120,0.0,120
+"Main (DeepSeek logs, 40-60 actions)",Provenance + policy-aware,0.9916666666666667,0.975,1.0,120,0.008333333333333333,120
+"Main (DeepSeek logs, 40-60 actions)",Plain + raw action records,1.0,1.0,1.0,120,0.0,120
+"Replication (fresh episodes, Qwen logs)","Single analyst, raw log",1.0,1.0,1.0,120,0.0,47
+"Replication (fresh episodes, Qwen logs)",Plain summaries,0.6,0.44166666666666665,0.75,120,0.0,48
+"Replication (fresh episodes, Qwen logs)",Provenance summaries,0.8521739130434782,0.7586206896551724,0.9412834224598925,115,0.0,46
+"Replication (fresh episodes, Qwen logs)",Plain + policy-aware,1.0,1.0,1.0,120,0.0,48
+"Replication (fresh episodes, Qwen logs)",Provenance + policy-aware,1.0,1.0,1.0,120,0.0,48
+"Scale (150-200 actions, Qwen logs)",Plain summaries,0.16216216216216217,0.05555555555555555,0.27631578947368424,74,0.0,32
+"Scale (150-200 actions, Qwen logs)",Provenance + policy-aware,0.9875,0.9625,1.0,80,0.0,32
+"Scale (150-200 actions, Qwen logs)",Plain + raw action records,1.0,1.0,1.0,80,0.0,31
+Qwen 3.8 27B summariser (DeepSeek logs),Plain summaries,0.6493506493506493,0.39466571834992886,0.8734177215189873,77,0.0,77
+Qwen 3.8 27B summariser (DeepSeek logs),Provenance + policy-aware,0.8607594936708861,0.759493670886076,0.9493670886075949,79,0.0,80
+Chunks k=2 (DeepSeek logs),Plain summaries,0.41025641025641024,0.2077922077922078,0.6075949367088608,78,0.0,80
+Chunks k=2 (DeepSeek logs),Provenance + policy-aware,0.9125,0.7375,1.0,80,0.0,80
+Chunks k=4 (DeepSeek logs),Plain summaries,0.6324786324786325,0.4260280029476787,0.8017241379310345,117,0.025,120
+Chunks k=4 (DeepSeek logs),Provenance + policy-aware,0.9916666666666667,0.975,1.0,120,0.008333333333333333,120
+Chunks k=8 (DeepSeek logs),Plain summaries,0.6,0.3428473581213307,0.8181818181818182,75,0.0,80
+Chunks k=8 (DeepSeek logs),Provenance + policy-aware,1.0,1.0,1.0,80,0.0,80
+"Scale (150-200 actions, Qwen logs)","Plain summaries, 8 chunks",0.21739130434782608,0.09859154929577464,0.35384615384615387,69,0.0,17

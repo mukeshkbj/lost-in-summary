@@ -16,7 +16,7 @@ def _adaption():
     global _adaption_client
     if _adaption_client is None:
         from adaption import Adaption
-        _adaption_client = Adaption()  # reads ADAPTION_API_KEY
+        _adaption_client = Adaption(timeout=400.0, max_retries=3)  # reads ADAPTION_API_KEY; long generations
     return _adaption_client
 
 
@@ -40,7 +40,8 @@ def complete(model: str, prompt: str, temperature: float = 0.7, max_tokens: int 
 if __name__ == "__main__":
     if "--list" in sys.argv:
         from ci.run import ROOT  # noqa: F401  (loads .env)
-        for m in _adaption().models.list(type="hosted"):
+        page = _adaption().models.list(type="hosted")
+        for m in getattr(page, "data", page):
             print(getattr(m, "id", m))
     elif len(sys.argv) > 2:  # quick smoke test: python -m ci.llm <model> "<prompt>"
         from ci.run import ROOT  # noqa: F401

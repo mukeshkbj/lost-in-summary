@@ -1,0 +1,7 @@
+setup,drop_0_to_75,lo,hi
+Plain summaries + raw action records,0.0,0.0,0.0
+Policy-aware + raw action records,0.0,0.0,0.0
+Plain summaries,0.12333333333333334,-0.02666666666666666,0.2833333333333333
+Plain + policy-aware summariser,0.06666666666666668,0.0,0.2
+Provenance summaries,-0.2633333333333333,-0.4800833333333334,-0.07666666666666665
+Provenance + policy-aware summariser,-0.016666666666666663,-0.04999999999999999,0.0

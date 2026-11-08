@@ -2,4 +2,7 @@ results/dryrun/
 __pycache__/
 *.pyc
 .env
+.venv/
 logs/*.txt
+*.log
+test_*.log

@@ -1,0 +1,5 @@
+analyst,mode,kin,hint,authority,det_drop,fa_drop,capture_index
+adaption/gemma-4-31b-it,naive,none,False,True,0.0,0.0,0.0
+adaption/gemma-4-31b-it,naive,none,True,True,0.0,0.0,0.0
+adaption/qwen3.5-397b,naive,none,False,True,0.0,0.0,0.0
+adaption/qwen3.5-397b,naive,none,True,True,0.0,0.0,0.0
